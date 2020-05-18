@@ -1,7 +1,3 @@
-#
-#circ_depth = 40
-#circuits = 100
-#
 #from qiskit import Aer, IBMQ, execute
 #from qiskit.tools.monitor import job_monitor
 #from qiskit import *
@@ -10,8 +6,8 @@
 #import numpy as np
 #import matplotlib.pyplot as plt
 #from qiskit import *
-#
 #import math
+#import pickle
 #from qiskit import Aer
 #from qiskit.visualization import plot_state_city
 #from qiskit.visualization import plot_histogram
@@ -43,7 +39,6 @@
 #
 #import numpy as np
 #import matplotlib.pyplot as plt
-#
 ## Importing standard Qiskit libraries and configuring account
 #from qiskit import QuantumCircuit, execute, Aer, IBMQ
 #from qiskit.compiler import transpile, assemble
@@ -323,12 +318,14 @@
 #
 #
 #
-#
 #n = 5
+#circ_depth = 10
 #circ_depth = circ_depth -1
 #shots = 100
 #runs = 1000
 #values = 4 #no of points you want for linear extrapolation 
+#circuits = 200
+#
 #
 #
 #
@@ -537,62 +534,45 @@
 #                counts1[circs,m,r] =c
 #                
 #                
-#
-#import pickle
-#
-#with open("exp3_counts_cd=" +str(circ_depth+1)+".p", 'wb') as fp:
+#with open('counts_job1.p', 'wb') as fp:
 #    pickle.dump(counts, fp, protocol=pickle.HIGHEST_PROTOCOL)
 #    
-#with open("exp3_counts1_cd=" +str(circ_depth+1)+".p", 'wb') as fp:
+#with open('counts1_job1.p', 'wb') as fp:
 #    pickle.dump(counts1, fp, protocol=pickle.HIGHEST_PROTOCOL)
 # 
-#with open("exp3_correction_sum_cd=" +str(circ_depth+1)+".p", 'wb') as fp:
+#with open('correction_sum_job1.p', 'wb') as fp:
 #    pickle.dump(correction_sum, fp, protocol=pickle.HIGHEST_PROTOCOL)
 #    
-#with open("exp3_gamma_sum_cd=" +str(circ_depth+1)+".p", 'wb') as fp:
+#with open('gamma_sum_job1.p', 'wb') as fp:
 #    pickle.dump(gamma_sum, fp, protocol=pickle.HIGHEST_PROTOCOL)
 #    
-#with open("exp3_gamma_sum2_cd=" +str(circ_depth+1)+".p", 'wb') as fp:
+#with open('gamma_sum2_job1.p', 'wb') as fp:
 #    pickle.dump(gamma_sum2, fp, protocol=pickle.HIGHEST_PROTOCOL)
 #    
 #    
-#    
-#    
-#    
 ###data processing 
-#
-#
-#job = [5,10,15,20,25,30,35,40]
-#
-#mean_mit_qpr ={}
-#mean_mit_le={}
-#mean_noisy={}
-#
-#stddev_mit_qpr={}
-#stddev_mit_le={}
-#stddev_noisy={}
-#
-#for cd in job:
 #    
-#    
-#    delta_mitigated_qpr= {}
-#    delta_mitigated_le = {}
-#    delta_noisy = {}
+#delta_mitigated_qpr= {}
+#delta_mitigated_le = {}
+#delta_noisy = {}
 #
+#
+#for job in range(1,6):
 #    
-#    with open("exp3_counts_cd=" +str(cd)+".p", 'rb') as fp:
+#    with open("counts_job" +str(job)+".p", 'rb') as fp:
 #        counts = pickle.load(fp) 
 #
-#    with open("exp3_counts1_cd=" +str(cd)+".p", 'rb') as fp:
+#
+#    with open("counts1_job" +str(job)+".p", 'rb') as fp:
 #        counts1 = pickle.load(fp)  
 #
-#    with open("exp3_correction_sum_cd=" +str(cd)+".p", 'rb') as fp:
+#    with open("correction_sum_job" +str(job)+".p", 'rb') as fp:
 #        correction_sum = pickle.load(fp)  
 #        
-#    with open("exp3_gamma_sum_cd=" +str(cd)+".p", 'rb') as fp:
+#    with open("gamma_sum_job" +str(job)+".p", 'rb') as fp:
 #        gamma_sum = pickle.load(fp)  
 #        
-#    with open("exp3_gamma_sum2_cd=" +str(cd)+".p", 'rb') as fp:
+#    with open("gamma_sum2_job" +str(job)+".p", 'rb') as fp:
 #        gamma_sum2 = pickle.load(fp)  
 #
 #
@@ -607,30 +587,31 @@
 #        prob_ideal={}
 #        prob_noisy={}
 #        prob_mitigated={}
-#        cs={}
-#        
-#        inv1 = {}
+#        inv1={}
 #        inv2={}
+#        cs={}
 #
 #        for r in range(runs):  
 #            prob_ideal[r] =  counts[circs, r , 'ideal'][state]/shots 
 #            prob_noisy[r] =  counts[circs, r , 'noisy'][state]/shots 
 #            prob_mitigated[r] =  (counts[circs, r , 'mitigated'][state]/shots ) *  ((-1)**(correction_sum[circs,r]))
-#            cs[r] = correction_sum[circs,r]
-#            
 #            inv1[r]= gamma_sum[circs,r]
 #            inv2[r]= gamma_sum2[circs,r]
+#            cs[r] = correction_sum[circs,r]
+#            
+#        invsum = (sum(inv1.values())) + (sum(inv2.values()))
 #
 #
 #        average_ideal = statistics.mean(prob_ideal.values())
 #        average_noisy = statistics.mean(prob_noisy.values())
-#       # average_mitigated = statistics.mean(prob_mitigated.values()) * (gamma**(sum(cs.values())))
-#        average_mitigated = statistics.mean(prob_mitigated.values()) * (gamma1**(sum(inv1.values()))) * (gamma2**(sum(inv2.values())))
+#        average_mitigated = statistics.mean(prob_mitigated.values()) * (gamma**(sum(cs.values())))
+#        average_mitigated = statistics.mean(prob_mitigated.values()) * (gamma1**(sum(inv1.values())))* (gamma2**(sum(inv2.values())))
 #
 #        
-#        delta_mitigated_qpr[ circs] = abs(average_ideal - average_mitigated)
+#        delta_mitigated_qpr[job , circs] = abs(average_ideal - average_mitigated)
 #
-#        delta_noisy[ circs] = abs(average_ideal - average_noisy)
+#
+#        delta_noisy[job , circs] = abs(average_ideal - average_noisy)
 #
 #
 #
@@ -655,18 +636,7 @@
 #        x1 = [0] + x
 #        ans = param[0]*np.array(x1) + param[1]
 #
-#        delta_mitigated_le[circs] = abs(average_ideal - ans[0])
-#        
-#
-#    
-#    
-#    mean_mit_qpr[cd] = statistics.mean(delta_mitigated_qpr.values()) 
-#    mean_mit_le[cd] = statistics.mean(delta_mitigated_le.values()) 
-#    mean_noisy[cd] = statistics.mean(delta_noisy.values()) 
-#
-#    stddev_mit_qpr[cd] = statistics.stdev(delta_mitigated_qpr.values())
-#    stddev_mit_le[cd] = statistics.stdev(delta_mitigated_le.values())
-#    stddev_noisy[cd] = statistics.stdev(delta_noisy.values())
+#        delta_mitigated_le[job, circs] = abs(average_ideal - ans[0])
 #
 #import seaborn as sns
 #from matplotlib.pyplot import figure
@@ -674,55 +644,44 @@
 #from pylab import *
 #fontsize = 15
 #
-#shift = 0.0001
-#slide = 0.8
 #
-#x = [5,10,15,20,25,30,35,40]
-#x1 = [i+slide for i in x]
-#x2 = [i-slide for i in x]
+#x = list(delta_noisy.values())
+#x1 = list(delta_mitigated_qpr.values())
+#x2 = list(delta_mitigated_le.values())
 #
 #
-#yn = list(mean_noisy.values())
-#yle = list(mean_mit_le.values())
-#yqpr = list(mean_mit_qpr.values())
+#binwidth = 0.0034468826495835333
+#bins = np.arange(min(x), max(x) + binwidth, binwidth)
+#alpha = 0.7
 #
-#ynerr = list(stddev_noisy.values())
-#ynerr_above = ynerr
-#ynerr_below = [i-shift for i in yn]
+#plt.hist(x, bins = bins, alpha = alpha, histtype='stepfilled' ,  color='red', label = 'Noisy' )
+#plt.hist(x1, bins = bins, alpha = alpha, histtype='stepfilled' ,  color='green', label = 'PEC-Mitigated' )
+##plt.hist(x2, bins = bins, alpha = alpha, histtype='stepfilled' ,  color='blue', label = 'LE-Mitigated' )
 #
+#plt.text( 0.03,500,'Noisy: $\mu = 0.01 \pm 0.02$', fontsize=fontsize)
 #
-#yleerr = list(stddev_mit_le.values())
-#yleerr_above = yleerr
-#yleerr_below = [i-shift for i in yleerr]
+#plt.text( 0.03,600,'$PEC-Mitigated: \mu = 0.002 \pm 0.004$', fontsize=fontsize)
 #
-#
-#yqprerr = list(stddev_mit_qpr.values())
-#yqprerr_above = yqprerr
-#yqprerr_below = [i-shift for i in yqprerr]
-#
-#
-#
-#
-## plt.plot(x, yn,'r', linestyle='dashed', linewidth = 1.5, marker='.', markersize=12, label="Noisy", ) 
-## plt.plot(x, yle, 'b', linestyle='dashed', linewidth = 1.5, marker='.', markersize=12, label="LE-Mitigated") 
-## plt.plot(x, yqpr,'g', linestyle='dashed', linewidth = 1.5, marker='.', markersize=12, label="PEC-Mitigated") 
-#
-#plt.errorbar(x=x , y = yqpr,  yerr=(yqprerr_below, yqprerr_above ), fmt='o', color='green',ecolor='green', elinewidth=3 ,capsize=5 ,label='PEC-Mitigated')
-#plt.errorbar(x=x1 , y = yle, yerr=(yleerr_below ,yleerr_above ), fmt='o', color='blue',ecolor='blue', elinewidth=3, capsize=5 ,label='Mitigated LE')
-#plt.errorbar(x =x2, y = yn, yerr=(ynerr_below, ynerr_above), fmt='o', color='red',ecolor='red', elinewidth=3, capsize=5 ,label='Noisy')
-#
-#
+##plt.text( 0.03,600, '$LE-Mitigated: \mu = 0.003 \pm 0.005$', fontsize=fontsize, fontweight = 'bold')
 #
 #ax = gca()
+#
 #for tick in ax.xaxis.get_major_ticks():
 #    tick.label1.set_fontsize(fontsize)
+#    #tick.label1.set_fontweight('bold')
 #for tick in ax.yaxis.get_major_ticks():
 #    tick.label1.set_fontsize(fontsize)
-#    
-#plt.xlabel('Circuit depth', fontsize=15)
-#plt.ylabel('Mean simulation precision', fontsize=15)
+#    #tick.label1.set_fontweight('bold')
+#
+#plt.xlabel('Simulation precision - $\delta$', fontsize=15)
+#plt.ylabel('Number of simulated circuits', fontsize=15)
 #plt.legend(loc = 'best')
+#
+#
 #plt.xlim(xmin=0)  
-#plt.ylim(ymin=0)  
-#plt.savefig('exp3_noisy-errbars.png')
+##plt.show()
+#
+#plt.savefig('exp2_n_qpr.png')
+#
+#
 #
