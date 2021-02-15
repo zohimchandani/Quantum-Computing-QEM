@@ -2,62 +2,36 @@
 circ_depth = 40
 circuits = 100
 
-from qiskit import Aer, IBMQ, execute
 from qiskit.tools.monitor import job_monitor
 from qiskit import *
 import random 
 from qiskit.providers.aer import noise
 import numpy as np
-import matplotlib.pyplot as plt
-from qiskit import *
-
 import math
-from qiskit import Aer
-from qiskit.visualization import plot_state_city
-from qiskit.visualization import plot_histogram
-from qiskit import IBMQ
-from qiskit.tools.monitor import job_monitor
+import pickle
 import qiskit.tools.jupyter  
-from qiskit.visualization import plot_circuit_layout
-import numpy as np
-from qiskit.visualization import plot_histogram, plot_gate_map, plot_circuit_layout
-from qiskit.tools.monitor import job_monitor
+from qiskit.visualization import plot_histogram, plot_gate_map, plot_circuit_layout, plot_state_city, circuit_drawer
 from math import pi
-from qiskit import QuantumCircuit, ClassicalRegister, QuantumRegister, execute
-from qiskit.tools.visualization import circuit_drawer
+from qiskit import QuantumCircuit, ClassicalRegister, QuantumRegister, execute, Aer, IBMQ
 from qiskit.quantum_info import state_fidelity
 from qiskit import BasicAer
 from qiskit.providers.ibmq import least_busy
 import pandas as pd
-from qiskit import execute, QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit.quantum_info.operators import Kraus, SuperOp
 from qiskit.providers.aer import QasmSimulator
-from qiskit.tools.visualization import plot_histogram
 import operator 
 from collections import Counter
 from scipy.optimize import curve_fit 
 from matplotlib import pyplot as plt 
 from random import randrange
-
 simulator = Aer.get_backend('qasm_simulator')
-
-import numpy as np
 import matplotlib.pyplot as plt
-
-# Importing standard Qiskit libraries and configuring account
-from qiskit import QuantumCircuit, execute, Aer, IBMQ
 from qiskit.compiler import transpile, assemble
 from qiskit.tools.jupyter import *
-from qiskit.visualization import *
 from qiskit.providers.ibmq import least_busy
-from qiskit import ClassicalRegister, QuantumRegister
-
-
 import statistics
 import dill
-
 import multiprocessing
-
 
 def noise(q , p): #single qubit noise
    
